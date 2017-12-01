@@ -255,9 +255,16 @@ public class Main {
             vertexBeforeCurrent = currentVertex;
         }
 
-        // append last vertex
+        // handle last vertex corner case
+        List<String> unsortedResultList = new ArrayList<>();
+        resultVertexes.add(vertexBeforeCurrent);
+        resultVertexes.forEach(v -> unsortedResultList.add(labels.get(v)));
+        unsortedResultList.sort(String.CASE_INSENSITIVE_ORDER);
+
+        // just to make nice output
         sb.append("(");
-        sb.append(labels.get(vertexBeforeCurrent));
+        // already sorted here
+        unsortedResultList.forEach(sb::append);
         sb.append(")");
         resultList.add(sb.toString());
         return resultList;
