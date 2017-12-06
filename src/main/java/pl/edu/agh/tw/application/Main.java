@@ -24,10 +24,16 @@ public class Main {
         g.addVertex("b");
         g.addVertex("c");
         g.addVertex("d");
+        g.addVertex("e");
         g.addEdge("a", "d");
-        g.addEdge("b", "c");
+        g.addEdge("b", "d");
+        g.addEdge("c", "a");
+        g.addEdge("b", "e");
 
-        String trace = "baadbc";
+        String trace = "acebdac";
+
+//        1.
+//        visualize(createDgraph(g));
 
 //        3.
 //        visualize(generateMinDependencyGraph(trace, g));
@@ -65,7 +71,6 @@ public class Main {
     // marker = 0
     // punkt 2
     private static List<String> generateFoataFNF(String trace, Graph<String, DefaultEdge> iGraph) {
-
         HashMap<String, Stack<String>> letterStacks = new HashMap<>();
         Set<String> alphabet = new HashSet<>();
 
@@ -75,8 +80,6 @@ public class Main {
             // create set alphabet
             alphabet.add(String.valueOf(c));
         }
-
-
         // since algorithm starts from the right side we need to reverse word
         String reversedWord = new StringBuilder(trace).reverse().toString();
 
@@ -98,7 +101,6 @@ public class Main {
             sb.append("(");
 
             List<String> unsortedResult = new ArrayList<>();
-
             //1.
             takeLettersFromTopLayer(stacks, unsortedResult);
 
@@ -107,7 +109,6 @@ public class Main {
 
             //3. then we need to take down marks just from the letters that are not in relation with our letter
             popMarks(iGraph, letterStacks, alphabet, unsortedResult);
-
 
             // sorted here
             for (String s : unsortedResult) {
@@ -121,6 +122,9 @@ public class Main {
         return result;
     }
 
+    /**
+     * Pops marks on stacks that commute with given letter
+     */
     private static void popMarks(Graph<String, DefaultEdge> g, HashMap<String, Stack<String>> letterStacks, Set<String> alphabet, List<String> unsortedResult) {
         unsortedResult.forEach(letter ->
                 alphabet.stream()
@@ -144,6 +148,12 @@ public class Main {
         }
     }
 
+    /**
+     * Setup letter stacks
+     * for each letter in reversed word :
+     * put letter on its own stack and on every stack which letter is not in relationship
+     * put mark on every commuting letter stack
+     */
     private static void fillStacks(Graph<String, DefaultEdge> g, HashMap<String, Stack<String>> letterStacks, Set<String> alphabet, String reversedWord) {
         for (char c : reversedWord.toCharArray()) {
 
@@ -164,7 +174,6 @@ public class Main {
             }
         }
     }
-
 
     // 3.
     private static Graph<Integer, DefaultEdge> generateMinDependencyGraph(String trace, Graph<String, DefaultEdge> iGraph) {
@@ -189,13 +198,11 @@ public class Main {
 
 
         for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                // letters of our interest occurs after letter at position i
-                if (j > i) {
-                    // if relation I does not contain edge between two letters create edge
-                    if (!iGraph.containsEdge(labels.get(i), labels.get(j)))
-                        dependencyGraph.addEdge(i, j);
-                }
+            // letters of our interest occurs after letter at position i
+            for (int j = i + 1; j < size; j++) {
+                // if relation I does not contain edge between two letters create edge
+                if (!iGraph.containsEdge(labels.get(i), labels.get(j)))
+                    dependencyGraph.addEdge(i, j);
             }
         }
 
@@ -242,7 +249,7 @@ public class Main {
                 resultVertexes.forEach(v -> unsortedResultList.add(labels.get(v)));
                 unsortedResultList.sort(String.CASE_INSENSITIVE_ORDER);
 
-                // just to make nice output
+                // brackets just to make nicer output
                 sb.append("(");
                 // already sorted here
                 unsortedResultList.forEach(sb::append);
@@ -261,7 +268,7 @@ public class Main {
         resultVertexes.forEach(v -> unsortedResultList.add(labels.get(v)));
         unsortedResultList.sort(String.CASE_INSENSITIVE_ORDER);
 
-        // just to make nice output
+        // just to make output nicer
         sb.append("(");
         // already sorted here
         unsortedResultList.forEach(sb::append);
